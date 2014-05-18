@@ -1,5 +1,11 @@
 package controllers;
 
+import handlers.HistoricalDataResultPanelsHandler;
+import handlers.RealTimeBarsDataResultPanelsHandler;
+import interfaces.IHistoricalDataHandler;
+
+import java.util.Date;
+
 import com.ib.client.CommissionReport;
 import com.ib.client.Contract;
 import com.ib.client.ContractDetails;
@@ -8,11 +14,34 @@ import com.ib.client.Execution;
 import com.ib.client.Order;
 import com.ib.client.OrderState;
 import com.ib.client.UnderComp;
+import com.ib.controller.Bar;
 
 public class MainController implements EWrapper {
 
+    private HistoricalDataResultPanelsHandler historicalDataHandler;
+    private RealTimeBarsDataResultPanelsHandler realTimeBarsHandler;
+
     public MainController() {
-        // TODO Auto-generated constructor stub
+
+    }
+
+    public HistoricalDataResultPanelsHandler getHistoricalDataHandler() {
+        return historicalDataHandler;
+    }
+
+    public void setHistoricalDataHandler(
+            HistoricalDataResultPanelsHandler historicalDataHandler) {
+        this.historicalDataHandler = historicalDataHandler;
+    }
+    
+
+    public RealTimeBarsDataResultPanelsHandler getRealTimeBarsHandler() {
+        return realTimeBarsHandler;
+    }
+
+    public void setRealTimeBarsHandler(
+            RealTimeBarsDataResultPanelsHandler realTimeBarsHandler) {
+        this.realTimeBarsHandler = realTimeBarsHandler;
     }
 
     @Override
@@ -199,11 +228,32 @@ public class MainController implements EWrapper {
     }
 
     @Override
-    public void historicalData(int reqId, String date, double open,
+    public void historicalData(int tickerId, String date, double open,
             double high, double low, double close, int volume, int count,
-            double WAP, boolean hasGaps) {
-        // TODO Auto-generated method stub
+            double wap, boolean hasGaps) {
 
+        IHistoricalDataHandler handler = this.historicalDataHandler
+                .getIHistoricalDataHandler(tickerId);
+
+        if (handler != null) {
+            if (date.startsWith("finished")) {
+                handler.historicalDataEnd();
+            } else {
+                long longDate;
+                if (date.length() == 8) {
+                    int year = Integer.parseInt(date.substring(0, 4));
+                    int month = Integer.parseInt(date.substring(4, 6));
+                    int day = Integer.parseInt(date.substring(6));
+                    longDate = new Date(year - 1900, month - 1, day).getTime() / 1000;
+                } else {
+                    longDate = Long.parseLong(date);
+                }
+                Bar bar = new Bar(longDate, high, low, open, close, wap,
+                        volume, count);
+                handler.historicalData(bar, hasGaps);
+            }
+        }
+        // recEOM();
     }
 
     @Override

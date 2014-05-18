@@ -137,24 +137,5 @@ public class VerticalPanel extends JPanel {
         }
     }
 
-    public static class StackPanel extends JPanel {
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 5757275764259621601L;
-
-        public StackPanel() {
-            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        }
-
-        public void add(JComponent comp) {
-            comp.setAlignmentX(0);
-            super.add(comp);
-        }
-
-        @Override
-        public Dimension getMaximumSize() {
-            return super.getPreferredSize();
-        }
-    }
+   
 }

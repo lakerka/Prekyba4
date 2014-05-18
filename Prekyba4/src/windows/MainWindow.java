@@ -1,5 +1,8 @@
 package windows;
 
+import handlers.HistoricalDataResultPanelsHandler;
+import handlers.RealTimeBarsDataResultPanelsHandler;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -13,9 +16,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
+import model.Ticker;
 import controllers.ConnectionController;
 import controllers.MainController;
 import panels.ConnectionPanel;
+import panels.MarketDataPanel;
 import panels.Messenger;
 
 public class MainWindow extends JFrame {
@@ -23,15 +28,16 @@ public class MainWindow extends JFrame {
     private MainController mainController;
     private ConnectionController connectionController;
     private Messenger messenger;
-    private JTextArea messageTextArea;
-    
-    
+    private JTextArea messageTextArea;   
+    private Ticker ticker;
     
     public MainWindow() {
         
+        this.ticker = new Ticker();
         this.mainController = new MainController();
         this.connectionController = new ConnectionController(mainController, 2000);
-        
+        this.mainController.setHistoricalDataHandler(new HistoricalDataResultPanelsHandler(connectionController));
+        this.mainController.setRealTimeBarsHandler(new RealTimeBarsDataResultPanelsHandler(connectionController));
         //initialize messenger
         this.messageTextArea = new JTextArea();
         this.messenger = new Messenger(messageTextArea);
@@ -55,7 +61,7 @@ public class MainWindow extends JFrame {
         JComponent jComponent1 = new ConnectionPanel(connectionController, messenger);
         jTabbedPane.addTab("Prisijungimas", null, jComponent1, "Skirta prisijungimui prie serverio");
         
-        JComponent jComponent2 = makeTextPanel("Rinkos duomenys");
+        JComponent jComponent2 = new MarketDataPanel(connectionController, ticker, mainController);
         jTabbedPane.addTab("Rinkos duomenys", null, jComponent2, "Skirta gauti rinkos duomenims");
         
         JComponent jComponent3 = makeTextPanel("Sandoriu siuntimas");
