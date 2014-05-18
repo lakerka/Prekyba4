@@ -1,5 +1,7 @@
 package panels;
 
+import java.awt.Component;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -35,19 +37,19 @@ import initial.*;
 public class HistRequestPanel extends JPanel {
 
     // final ContractPanel m_contractPanel = new ContractPanel(m_contract);
-    final JTextFieldNumbersSupported m_end = new JTextFieldNumbersSupported();
+    final JTextFieldNumbersSupported endDate = new JTextFieldNumbersSupported();
 
-    final JTextFieldNumbersSupported m_duration = new JTextFieldNumbersSupported();
+    final JTextFieldNumbersSupported duration = new JTextFieldNumbersSupported();
 
-    final TCombo<DurationUnit> m_durationUnit = new TCombo<DurationUnit>(
+    final TCombo<DurationUnit> durationUnit = new TCombo<DurationUnit>(
             DurationUnit.values());
 
-    final TCombo<BarSize> m_barSize = new TCombo<BarSize>(BarSize.values());
+    final TCombo<BarSize> barSize = new TCombo<BarSize>(BarSize.values());
 
-    final TCombo<WhatToShow> m_whatToShow = new TCombo<WhatToShow>(
+    final TCombo<WhatToShow> whatToShow = new TCombo<WhatToShow>(
             WhatToShow.values());
 
-    final JCheckBox m_rthOnly = new JCheckBox();
+    final JCheckBox regularTradingHoursOnly = new JCheckBox();
 
     final ContractPanel contractPanel;
 
@@ -73,10 +75,13 @@ public class HistRequestPanel extends JPanel {
         this.mainController = mainController;
 
         // initialize panel with example data
-        m_end.setText("20130101 12:00:00");
-        m_duration.setText("1");
-        m_durationUnit.setSelectedItem(DurationUnit.WEEK);
-        m_barSize.setSelectedItem(BarSize._1_hour);
+        String endDateString = "20130101 12:00:00";
+        endDate.setColumns(endDateString.length()/2 + 2);
+        endDate.setText(endDateString);
+        
+        duration.setText("1");
+        durationUnit.setSelectedItem(DurationUnit.WEEK);
+        barSize.setSelectedItem(BarSize._1_hour);
 
         JButton button = new JButton("Request historical data");
         button.addActionListener(new ActionListener() {
@@ -89,13 +94,13 @@ public class HistRequestPanel extends JPanel {
         });
 
         VerticalPanel paramPanel = new VerticalPanel();
-
-        paramPanel.add("End", m_end);
-        paramPanel.add("Duration", m_duration);
-        paramPanel.add("Duration unit", m_durationUnit);
-        paramPanel.add("Bar size", m_barSize);
-        paramPanel.add("What to show", m_whatToShow);
-        paramPanel.add("RTH only", m_rthOnly);
+        
+        paramPanel.add("End", endDate);
+        paramPanel.add("Duration", duration);
+        paramPanel.add("Duration unit", durationUnit);
+        paramPanel.add("Bar size", barSize);
+        paramPanel.add("What to show", whatToShow);
+        paramPanel.add("Regular trading hours", regularTradingHoursOnly);
 
         VerticalPanel butPanel = new VerticalPanel();
         butPanel.add(button);
@@ -120,9 +125,9 @@ public class HistRequestPanel extends JPanel {
                 mainController.getRealTimeBarsHandler());
 
         mainController.getHistoricalDataHandler().reqHistoricalData(ticker,
-                newContract, m_end.getText(), m_duration.getInt(),
-                m_durationUnit.getSelectedItem(), m_barSize.getSelectedItem(),
-                m_whatToShow.getSelectedItem(), m_rthOnly.isSelected(), panel);
+                newContract, endDate.getText(), duration.getInt(),
+                durationUnit.getSelectedItem(), barSize.getSelectedItem(),
+                whatToShow.getSelectedItem(), regularTradingHoursOnly.isSelected(), panel);
 
         resultsPanel.addTab("Historical " + newContract.symbol(), panel, true,
                 true);

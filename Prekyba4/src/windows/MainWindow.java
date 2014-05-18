@@ -2,6 +2,8 @@ package windows;
 
 import handlers.HistoricalDataResultPanelsHandler;
 import handlers.RealTimeBarsDataResultPanelsHandler;
+import handlers.TopDataResultRowsHandler;
+import initial.Messenger;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -21,70 +23,76 @@ import controllers.ConnectionController;
 import controllers.MainController;
 import panels.ConnectionPanel;
 import panels.MarketDataPanel;
-import panels.Messenger;
 
 public class MainWindow extends JFrame {
 
     private MainController mainController;
     private ConnectionController connectionController;
     private Messenger messenger;
-    private JTextArea messageTextArea;   
+    private JTextArea messageTextArea;
     private Ticker ticker;
-    
+
     public MainWindow() {
-        
-        this.ticker = new Ticker();
-        this.mainController = new MainController();
-        this.connectionController = new ConnectionController(mainController, 2000);
-        this.mainController.setHistoricalDataHandler(new HistoricalDataResultPanelsHandler(connectionController));
-        this.mainController.setRealTimeBarsHandler(new RealTimeBarsDataResultPanelsHandler(connectionController));
-        //initialize messenger
+
+        // initialize messenger
         this.messageTextArea = new JTextArea();
         this.messenger = new Messenger(messageTextArea);
-    }
-    
-    public void init() {
+
+        this.ticker = new Ticker();
+        this.mainController = new MainController(messenger, ticker);
         
-        //Create and set up the window.
+        this.connectionController = new ConnectionController(mainController,
+                2000);
+        
+        this.mainController
+                .setHistoricalDataHandler(new HistoricalDataResultPanelsHandler(
+                        connectionController));
+        this.mainController
+                .setRealTimeBarsHandler(new RealTimeBarsDataResultPanelsHandler(
+                        connectionController));
+        this.mainController
+                .setTopDataResultRowsHandler(new TopDataResultRowsHandler(
+                        connectionController, mainController));
+
+    }
+
+    public void init() {
+
+        // Create and set up the window.
         setTitle("Prekyba");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setPreferredSize(new Dimension(700, 500));
-        
+        setPreferredSize(new Dimension(1200, 700));
+
         JTabbedPane jTabbedPane = new JTabbedPane();
         this.add(jTabbedPane);
-        
-        //create socket
-        
-//        EClientSocketObserved eClientSocketObserved = new EClientSocketObserved(null, 3000);
-        
-        //create content of this jframe
-        JComponent jComponent1 = new ConnectionPanel(connectionController, messenger);
-        jTabbedPane.addTab("Prisijungimas", null, jComponent1, "Skirta prisijungimui prie serverio");
-        
-        JComponent jComponent2 = new MarketDataPanel(connectionController, ticker, mainController);
-        jTabbedPane.addTab("Rinkos duomenys", null, jComponent2, "Skirta gauti rinkos duomenims");
-        
-        JComponent jComponent3 = makeTextPanel("Sandoriu siuntimas");
-        jTabbedPane.addTab("Sandoriu siuntimas", null, jComponent3, "Skirta siusti sandoriams");
-        
-       
-        
-        messageTextArea.setEditable( false);
-        messageTextArea.setLineWrap( true);
-        
-        JScrollPane msgScroll = new JScrollPane( messageTextArea );
-        msgScroll.setPreferredSize( new Dimension( 10000, 200) );
-        
+
+        // create content of this jframe
+        JComponent jComponent1 = new ConnectionPanel(connectionController,
+                messenger);
+        jTabbedPane.addTab("Connections", null, jComponent1, null);
+
+        JComponent jComponent2 = new MarketDataPanel(connectionController,
+                ticker, mainController);
+        jTabbedPane.addTab("Market data", null, jComponent2, null);
+
+        JComponent jComponent3 = makeTextPanel("Trading");
+        jTabbedPane.addTab("Trading", null, jComponent3, null);
+
+        messageTextArea.setEditable(false);
+        messageTextArea.setLineWrap(true);
+
+        JScrollPane msgScroll = new JScrollPane(messageTextArea);
+        msgScroll.setPreferredSize(new Dimension(10000, 200));
+
         JTabbedPane messagePane = new JTabbedPane();
-        messagePane.addTab( "Messages", msgScroll);
-        
-        
-        this.add( messagePane, BorderLayout.SOUTH);
-        
+        messagePane.addTab("Messages", msgScroll);
+
+        this.add(messagePane, BorderLayout.SOUTH);
+
         pack();
         setVisible(true);
     }
-    
+
     protected JComponent makeTextPanel(String text) {
         JPanel panel = new JPanel(false);
         JLabel filler = new JLabel(text);
@@ -93,7 +101,5 @@ public class MainWindow extends JFrame {
         panel.add(filler);
         return panel;
     }
-     
-
 
 }

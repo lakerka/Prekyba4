@@ -1,4 +1,4 @@
-package panels;
+package initial;
 
 import javax.swing.JTextArea;
 

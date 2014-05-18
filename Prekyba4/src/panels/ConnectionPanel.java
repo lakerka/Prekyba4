@@ -1,8 +1,10 @@
 package panels;
 
 import initial.EClientSocketObserved;
+import initial.Messenger;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,10 +23,13 @@ import controllers.ConnectionController;
 
 public class ConnectionPanel extends JPanel implements ConnectionStatusListener {
 
+    protected static Color DARK_GREEN = new Color(79, 195, 31);
+    
     private final JTextField m_host = new JTextField("127.0.0.1", 10);
     private final JTextField m_port = new JTextField("7496", 10);
     private final JTextField m_clientId = new JTextField("0", 10);
-    private final JLabel connectionStatusJLabel = new JLabel("Disconnected");
+    private JLabel connectionStatusJLabel;
+    
 
     private ConnectionController connectionController;
     private Messenger messenger;
@@ -32,6 +37,9 @@ public class ConnectionPanel extends JPanel implements ConnectionStatusListener 
     public ConnectionPanel(final ConnectionController connectionController,
             Messenger messenger) {
 
+        connectionStatusJLabel = new JLabel("Disconnected");
+        connectionStatusJLabel.setForeground(Color.RED);
+        
         if (connectionController == null || messenger == null) {
             throw new IllegalArgumentException("Arguments must not be null!");
         }
@@ -112,11 +120,12 @@ public class ConnectionPanel extends JPanel implements ConnectionStatusListener 
         if (isConnected) {
             
             connectionStatusJLabel.setText("Connected");
+            connectionStatusJLabel.setForeground(DARK_GREEN);
             
         }else {
             
             connectionStatusJLabel.setText("Disconnected");
-            
+            connectionStatusJLabel.setForeground(Color.RED);
         }
         
     }
