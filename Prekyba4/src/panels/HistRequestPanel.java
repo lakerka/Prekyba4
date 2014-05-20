@@ -53,32 +53,28 @@ public class HistRequestPanel extends JPanel {
 
     final ContractPanel contractPanel;
 
-    private ConnectionController connectionController;
     private final NewContract newContract = new NewContract();
     private NewTabbedPanel resultsPanel;
     private Ticker ticker;
     private MainController mainController;
 
-    public HistRequestPanel(ConnectionController connectionController,
-            NewTabbedPanel resultsPanel, Ticker ticker,
+    public HistRequestPanel(NewTabbedPanel resultsPanel,
             MainController mainController) {
 
-        if (connectionController == null) {
+        if (mainController == null) {
             throw new IllegalArgumentException("Arguments must not be null!");
         }
 
         this.contractPanel = new ContractPanel(this.newContract);
 
-        this.connectionController = connectionController;
         this.resultsPanel = resultsPanel;
-        this.ticker = ticker;
         this.mainController = mainController;
 
         // initialize panel with example data
         String endDateString = "20130101 12:00:00";
-        endDate.setColumns(endDateString.length()/2 + 2);
+        endDate.setColumns(endDateString.length() / 2 + 2);
         endDate.setText(endDateString);
-        
+
         duration.setText("1");
         durationUnit.setSelectedItem(DurationUnit.WEEK);
         barSize.setSelectedItem(BarSize._1_hour);
@@ -94,7 +90,7 @@ public class HistRequestPanel extends JPanel {
         });
 
         VerticalPanel paramPanel = new VerticalPanel();
-        
+
         paramPanel.add("End", endDate);
         paramPanel.add("Duration", duration);
         paramPanel.add("Duration unit", durationUnit);
@@ -119,15 +115,21 @@ public class HistRequestPanel extends JPanel {
     protected void onHistorical() {
 
         contractPanel.onOK();
+        
+        if (!mainController.isConnected()) {
+            mainController.displayNotConnected();
+            return;
+        }
 
         TableResultPanel panel = new TableResultPanel(true,
                 mainController.getHistoricalDataHandler(),
                 mainController.getRealTimeBarsHandler());
 
-        mainController.getHistoricalDataHandler().reqHistoricalData(ticker,
+        mainController.getHistoricalDataHandler().reqHistoricalData(
                 newContract, endDate.getText(), duration.getInt(),
                 durationUnit.getSelectedItem(), barSize.getSelectedItem(),
-                whatToShow.getSelectedItem(), regularTradingHoursOnly.isSelected(), panel);
+                whatToShow.getSelectedItem(),
+                regularTradingHoursOnly.isSelected(), panel);
 
         resultsPanel.addTab("Historical " + newContract.symbol(), panel, true,
                 true);

@@ -1,15 +1,17 @@
 package windows;
 
 import handlers.HistoricalDataResultPanelsHandler;
+import handlers.LiveOrdersHandler;
+import handlers.OrdersHandler;
 import handlers.RealTimeBarsDataResultPanelsHandler;
 import handlers.TopDataResultRowsHandler;
+import handlers.TradeReportsHandler;
 import initial.Messenger;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -23,6 +25,8 @@ import controllers.ConnectionController;
 import controllers.MainController;
 import panels.ConnectionPanel;
 import panels.MarketDataPanel;
+import panels.NewTabbedPanel;
+import panels.TradingPanel;
 
 public class MainWindow extends JFrame {
 
@@ -30,7 +34,8 @@ public class MainWindow extends JFrame {
     private ConnectionController connectionController;
     private Messenger messenger;
     private JTextArea messageTextArea;
-    private Ticker ticker;
+    private Ticker requestTicker;
+    private Ticker orderTicker;
 
     public MainWindow() {
 
@@ -38,21 +43,31 @@ public class MainWindow extends JFrame {
         this.messageTextArea = new JTextArea();
         this.messenger = new Messenger(messageTextArea);
 
-        this.ticker = new Ticker();
-        this.mainController = new MainController(messenger, ticker);
-        
+        this.mainController = new MainController(messenger);
+
         this.connectionController = new ConnectionController(mainController,
                 2000);
-        
+
+        this.mainController.setConnectionController(connectionController);
+
         this.mainController
                 .setHistoricalDataHandler(new HistoricalDataResultPanelsHandler(
-                        connectionController));
+                        mainController));
         this.mainController
                 .setRealTimeBarsHandler(new RealTimeBarsDataResultPanelsHandler(
                         connectionController));
         this.mainController
                 .setTopDataResultRowsHandler(new TopDataResultRowsHandler(
-                        connectionController, mainController));
+                        mainController));
+
+        this.mainController.setOrdersHandler(new OrdersHandler(
+                connectionController, this.mainController));
+
+        this.mainController.setLiveOrdersHandler(new LiveOrdersHandler(
+                connectionController, this.mainController));
+
+        this.mainController.setTradeReportsHandler(new TradeReportsHandler(
+                this.mainController));
 
     }
 
@@ -63,20 +78,20 @@ public class MainWindow extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setPreferredSize(new Dimension(1200, 700));
 
-        JTabbedPane jTabbedPane = new JTabbedPane();
+        NewTabbedPanel jTabbedPane = new NewTabbedPanel(true);
         this.add(jTabbedPane);
 
         // create content of this jframe
         JComponent jComponent1 = new ConnectionPanel(connectionController,
                 messenger);
-        jTabbedPane.addTab("Connections", null, jComponent1, null);
+        jTabbedPane.addTab("Connections", jComponent1);
 
         JComponent jComponent2 = new MarketDataPanel(connectionController,
-                ticker, mainController);
-        jTabbedPane.addTab("Market data", null, jComponent2, null);
+                requestTicker, mainController);
+        jTabbedPane.addTab("Market data", jComponent2);
 
-        JComponent jComponent3 = makeTextPanel("Trading");
-        jTabbedPane.addTab("Trading", null, jComponent3, null);
+        JComponent jComponent3 = new TradingPanel(this, mainController);
+        jTabbedPane.addTab("Trading", jComponent3);
 
         messageTextArea.setEditable(false);
         messageTextArea.setLineWrap(true);

@@ -23,10 +23,11 @@ public class MarketDataPanel extends JPanel {
     public MarketDataPanel(ConnectionController connectionController,
             Ticker ticker, MainController mainController) {
 
-        requestsPanel.addTab("Historical", new HistRequestPanel(
-                connectionController, resultsPanel, ticker, mainController));
+        requestsPanel.addTab("Historical", new HistRequestPanel(resultsPanel,
+                mainController));
 
-        requestsPanel.addTab("Realtime", new TopRequestPanel(mainController, resultsPanel));
+        requestsPanel.addTab("Realtime", new TopRequestPanel(mainController,
+                resultsPanel));
 
         setLayout(new BorderLayout());
         add(requestsPanel, BorderLayout.NORTH);
