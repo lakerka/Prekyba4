@@ -6,19 +6,22 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+
 public class VerticalPanel extends JPanel {
-    
+
     /**
      * 
      */
     private static final long serialVersionUID = -1948887405459558442L;
 
     private class FlowPanel extends JPanel {
-        
+
         /**
          * 
          */
@@ -137,5 +140,24 @@ public class VerticalPanel extends JPanel {
         }
     }
 
-   
+    //test panel
+//    public static void main(String[] args) {
+//
+//        JFrame jFrame = new JFrame();
+//        jFrame.setTitle("TEST");
+//        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        jFrame.setPreferredSize(new Dimension(1000, 500));
+//
+//        VerticalPanel component = new VerticalPanel();
+//
+//        component.add("First panel is good", new JButton("FIRST"));
+//        component.add("Second panel", new JButton("SECOND"));
+//        component.add("Third", new JButton("THIRD"));
+//
+//        jFrame.add(component);
+//
+//        jFrame.pack();
+//        jFrame.setVisible(true);
+//    }
+
 }

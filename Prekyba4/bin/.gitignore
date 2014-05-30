@@ -1,11 +1,11 @@
+/buttons/
 /com/
 /controllers/
+/handlers/
 /initial/
 /interfaces/
 /listeners/
-/panels/
-/windows/
-/handlers/
 /model/
-/buttons/
+/panels/
 /utilities/
+/windows/
